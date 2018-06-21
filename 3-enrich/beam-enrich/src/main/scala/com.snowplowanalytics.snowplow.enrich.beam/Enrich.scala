@@ -45,7 +45,7 @@ import utils._
 /*
 sbt "runMain com.snowplowanalytics.snowplow.enrich.beam.Enrich
   --project=[PROJECT] --runner=DataflowRunner --zone=[ZONE] --streaming=true
-  --input=[INPUT TOPIC]
+  --input=[INPUT SUBSCRIPTION]
   --output=[OUTPUT TOPIC]
   --bad=[BAD TOPIC]
   --resolver=[RESOLVER FILE PATH]
@@ -88,7 +88,7 @@ object Enrich {
       }
     }
 
-    val input: SCollection[Array[Byte]] = sc.pubsubTopic(config.input).withName("input")
+    val input: SCollection[Array[Byte]] = sc.pubsubSubscription(config.input).withName("input")
     val enriched: SCollection[Validation[BadRow, EnrichedEvent]] = input
       .map { rawEvent =>
         cachedFiles()
