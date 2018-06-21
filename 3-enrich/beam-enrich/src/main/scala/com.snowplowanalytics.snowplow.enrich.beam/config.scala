@@ -35,6 +35,7 @@ import iglu.client.Resolver
 
 object config {
   final case class EnrichConfig(
+    jobName: String,
     input: String,
     output: String,
     bad: String,
@@ -43,11 +44,12 @@ object config {
   )
   object EnrichConfig {
     def apply(args: Args): Validation[String, EnrichConfig] = for {
+      jobName <- args.optional("job-name").toSuccess("Missing `job-name` argument")
       input <- args.optional("input").toSuccess("Missing `input` argument")
       output <- args.optional("output").toSuccess("Missing `output` argument")
       bad <- args.optional("bad").toSuccess("Missing `bad` argument")
       resolver <- args.optional("resolver").toSuccess("Missing `resolver` argument")
-    } yield EnrichConfig(input, output, bad, resolver, args.optional("enrichments"))
+    } yield EnrichConfig(jobName, input, output, bad, resolver, args.optional("enrichments"))
   }
 
   final case class ParsedEnrichConfig(

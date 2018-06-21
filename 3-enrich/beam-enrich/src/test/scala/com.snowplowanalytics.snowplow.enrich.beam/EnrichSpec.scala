@@ -82,7 +82,7 @@ class EnrichSpec extends PipelineSpec {
 
   "Enrich" should "enrich a struct event" in {
     JobTest[Enrich.type]
-      .args("--input=in", "--output=out", "--bad=bad",
+      .args("--job-name=j", "--input=in", "--output=out", "--bad=bad",
         "--resolver=" + Paths.get(getClass.getResource("/iglu_resolver.json").toURI()))
       .input(PubsubIO("in"), raw.map(Base64.decodeBase64))
       .distCache(DistCacheIO(""), List.empty[Either[String, Path]])

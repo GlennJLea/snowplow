@@ -57,7 +57,7 @@ class EnrichWithLocalFileSpec extends PipelineSpec {
     )
 
     JobTest[Enrich.type]
-      .args("--input=in", "--output=out", "--bad=bad",
+      .args("--job-name=j", "--input=in", "--output=out", "--bad=bad",
         "--resolver=" + Paths.get(getClass.getResource("/iglu_resolver.json").toURI()),
         "--enrichments=" + Paths.get(getClass.getResource("/enrichments").toURI()))
       .input(PubsubIO("in"), raw.map(Base64.decodeBase64))

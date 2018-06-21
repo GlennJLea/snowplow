@@ -45,6 +45,7 @@ import utils._
 /*
 sbt "runMain com.snowplowanalytics.snowplow.enrich.beam.Enrich
   --project=[PROJECT] --runner=DataflowRunner --zone=[ZONE] --streaming=true
+  --job-name=[JOB NAME]
   --input=[INPUT SUBSCRIPTION]
   --output=[OUTPUT TOPIC]
   --bad=[BAD TOPIC]
@@ -63,6 +64,7 @@ object Enrich {
     val (sc, args) = ContextAndArgs(cmdlineArgs)
     val parsedConfig = for {
       config <- EnrichConfig(args)
+      _ = sc.setJobName(config.jobName)
       resolverJson <- parseResolver(config.resolver)
       resolver <- Resolver.parse(resolverJson).leftMap(_.toList.mkString("\n"))
       enrichmentRegistryJson <- parseEnrichmentRegistry(config.enrichments)(resolver)
