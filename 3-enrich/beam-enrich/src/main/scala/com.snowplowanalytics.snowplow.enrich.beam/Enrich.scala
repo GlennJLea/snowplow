@@ -58,8 +58,6 @@ object Enrich {
   // the maximum record size in Google PubSub is 10Mb
   private val MaxRecordSize = 10000000
 
-  implicit def enrichSCollection[T](collection: SCollection[T]) = new RichSCollection[T](collection)
-
   def main(cmdlineArgs: Array[String]): Unit = {
     val (sc, args) = ContextAndArgs(cmdlineArgs)
     val parsedConfig = for {
@@ -73,7 +71,7 @@ object Enrich {
 
     parsedConfig match {
       case Failure(e) =>
-        System.err.println(s"An error occured parsing the configuration: $e")
+        System.err.println(e)
         System.exit(1)
       case Success(config) =>
         run(sc, config)
@@ -100,13 +98,13 @@ object Enrich {
       .flatten
       .withName("enriched")
 
-    val (successes, failures) = enriched.partition2(_.isSuccess)
+    val (successes, failures) = enriched.partition(_.isSuccess)
     val (tooBigSuccesses, properlySizedsuccesses) = successes
       .collect { case Success(enrichedEvent) =>
         val formattedEnrichedEvent = tabSeparatedEnrichedEvent(enrichedEvent)
         (formattedEnrichedEvent, getStringSize(formattedEnrichedEvent))
       }
-      .partition2(_._2 >= MaxRecordSize)
+      .partition(_._2 >= MaxRecordSize)
     properlySizedsuccesses.map(_._1).withName("enriched-good").saveAsPubsub(config.output)
 
     val failureCollection: SCollection[BadRow] =
