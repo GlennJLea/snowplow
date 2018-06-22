@@ -1,27 +1,32 @@
-# beam-enrich
+# Beam Enrich
 
-## Raison d'être:
+## Introduction
 
-TODO: your project description
+Beam Enrich processes raw Snowplow events from an input [GCP PubSub][pubsub] subscription,
+enrich them and store them into an output PubSub topic.
+Events are enriched using the [scala-common-enrich][common-enrich] library.
 
-## Features:
+## Building
 
-This project comes with number of preconfigured features, including:
+This project uses [sbt-native-packager][sbt-native-packager].
 
-### sbt-native-packager
+### Zip archive
 
-Use `sbt-native-packager` instead of `sbt-assembly` to:
- * reduce build time
- * enable efficient dependency caching
- * reduce job submission time
+To build the zip archive, run:
 
-To build package run:
-
-```
+```bash
 sbt universal:packageBin
 ```
 
-### Running
+### Docker image
+
+To build a Docker image, run:
+
+```bash
+sbt docker:publishLocal
+```
+
+## Running
 
 Once unzipped the artifact can be run as follows:
 
@@ -31,7 +36,22 @@ Once unzipped the artifact can be run as follows:
   --streaming=true \
   --zone=europe-west2-a \
   --gcpTempLocation=gs://location/ \
-  --input=projects/project/topics/raw-topic \
+  --input=projects/project/subscriptions/raw-topic-subscription \
+  --output=projects/project/topics/enriched-topic \
+  --bad=projects/project/topics/bad-topic \
+  --resolver=iglu_resolver.json \
+  --enrichments=enrichments/
+```
+
+A container can be run as follows:
+
+```bash
+docker run snowplow-beam-enrich:0.1.0 \
+  --runner=DataFlowRunner \
+  --streaming=true \
+  --zone=europe-west2-a \
+  --gcpTempLocation=gs://location/ \
+  --input=projects/project/subscriptions/raw-topic-subscription \
   --output=projects/project/topics/enriched-topic \
   --bad=projects/project/topics/bad-topic \
   --resolver=iglu_resolver.json \
@@ -58,26 +78,21 @@ Cloud Storage, e.g. for the IP lookups enrichment:
 }
 ```
 
-### Testing
+A full list of all the Beam CLI options can be found at:
+https://cloud.google.com/dataflow/pipelines/specifying-exec-params#setting-other-cloud-pipeline-options.
 
-This template comes with an example of a test, to run tests:
+## Testing
+
+To run the tests:
 
 ```
 sbt test
 ```
 
-### Scala style
+## REPL
 
-Find style configuration in `scalastyle-config.xml`. To enforce style run:
-
-```
-sbt scalastyle
-```
-
-### REPL
-
-To experiment with current codebase in [Scio REPL](https://github.com/spotify/scio/wiki/Scio-REPL)
-simply:
+To experiment with the current codebase in [Scio REPL](https://github.com/spotify/scio/wiki/Scio-REPL)
+simply run:
 
 ```
 sbt repl/run
@@ -86,3 +101,22 @@ sbt repl/run
 ---
 
 This project is based on the [scio.g8](https://github.com/spotify/scio.g8).
+
+## Copyright and license
+
+Copyright 2013-2018 Snowplow Analytics Ltd.
+
+Licensed under the [Apache License, Version 2.0][license] (the "License");
+you may not use this software except in compliance with the License.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+[pubsub]: https://cloud.google.com/pubsub/
+[sbt-native-packager]: https://github.com/sbt/sbt-native-packager
+[common-enrich]: https://github.com/snowplow/snowplow/tree/master/3-enrich/scala-common-enrich
+
+[license]: http://www.apache.org/licenses/LICENSE-2.0
