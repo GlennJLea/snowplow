@@ -44,11 +44,11 @@ object config {
   )
   object EnrichConfig {
     def apply(args: Args): Validation[String, EnrichConfig] = for {
+      _ <- if (args.optional("help").isDefined) helpString(configurations).failure else "".success
       l <- configurations.collect {
         case RequiredConfiguration(key, _) => args.optional(key).toSuccess(s"Missing `$key` argument").toValidationNel
-      }.sequenceU.leftMap(_.toList.mkString(", "))
+      }.sequenceU.leftMap(_.toList.mkString("\n"))
       List(jobName, input, output, bad, resolver) = l
-      _ <- if (args.optional("help").isDefined) helpString(configurations).failure else "".success
     } yield EnrichConfig(jobName, input, output, bad, resolver, args.optional("enrichments"))
 
     private val configurations = List(
@@ -63,11 +63,11 @@ object config {
     private def helpString(configs: List[Configuration]): String =
       "Possible configuration are:\n" +
         configs.map {
-          case OptionalConfiguration(key, desc) => s"--$key VALUE, optional, $desc"
-          case RequiredConfiguration(key, desc) => s"--$key VALUE, required, $desc"
+          case OptionalConfiguration(key, desc) => s"--$key=VALUE, optional, $desc"
+          case RequiredConfiguration(key, desc) => s"--$key=VALUE, required, $desc"
         }.mkString("\n") +
-        "--help, Display this message" +
-        "A full list of all the Beam CLI options can be found at: https://cloud.google.com/dataflow/pipelines/specifying-exec-params#setting-other-cloud-pipeline-options"
+        "\n--help, Display this message" +
+        "\nA full list of all the Beam CLI options can be found at: https://cloud.google.com/dataflow/pipelines/specifying-exec-params#setting-other-cloud-pipeline-options"
   }
 
   sealed trait Configuration {

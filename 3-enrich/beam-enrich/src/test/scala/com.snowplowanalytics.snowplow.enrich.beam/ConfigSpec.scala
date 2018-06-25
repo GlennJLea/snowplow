@@ -31,31 +31,31 @@ class ConfigSpec extends FreeSpec {
     "make an EnrichConfig smart ctor available" - {
       "which fails if --job-name is not present" in {
         EnrichConfig(Args(Array.empty)) shouldEqual Failure(
-          "Missing `job-name` argument, " +
-          "Missing `input` argument, " +
-          "Missing `output` argument, " +
-          "Missing `bad` argument, " +
+          "Missing `job-name` argument\n" +
+          "Missing `input` argument\n" +
+          "Missing `output` argument\n" +
+          "Missing `bad` argument\n" +
           "Missing `resolver` argument"
         )
       }
       "which fails if --input is not present" in {
         EnrichConfig(Args(Array("--job-name=j"))) shouldEqual Failure(
-          "Missing `input` argument, " +
-          "Missing `output` argument, " +
-          "Missing `bad` argument, " +
+          "Missing `input` argument\n" +
+          "Missing `output` argument\n" +
+          "Missing `bad` argument\n" +
           "Missing `resolver` argument"
         )
       }
       "which fails if --output is not present" in {
         EnrichConfig(Args(Array("--job-name=j", "--input=i"))) shouldEqual Failure(
-          "Missing `output` argument, " +
-          "Missing `bad` argument, " +
+          "Missing `output` argument\n" +
+          "Missing `bad` argument\n" +
           "Missing `resolver` argument"
         )
       }
       "which fails if --bad is not present" in {
         EnrichConfig(Args(Array("--job-name=j", "--input=i", "--output=o"))) shouldEqual Failure(
-          "Missing `bad` argument, " +
+          "Missing `bad` argument\n" +
           "Missing `resolver` argument"
         )
       }
