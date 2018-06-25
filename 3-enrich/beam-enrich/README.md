@@ -28,11 +28,14 @@ sbt docker:publishLocal
 
 ## Running
 
+### Directly
+
 Once unzipped the artifact can be run as follows:
 
 ```bash
 ./bin/snowplow-beam-enrich \
   --runner=DataFlowRunner \
+  --project=project-id \
   --streaming=true \
   --zone=europe-west2-a \
   --gcpTempLocation=gs://location/ \
@@ -42,21 +45,44 @@ Once unzipped the artifact can be run as follows:
   --resolver=iglu_resolver.json \
   --enrichments=enrichments/
 ```
+
+To display the help message:
+
+```bash
+./bin/snowplow-beam-enrich \
+  --runner=DataFlowRunner \
+  --help
+```
+
+### Through a docker container
 
 A container can be run as follows:
 
 ```bash
-docker run snowplow-beam-enrich:0.1.0 \
+docker run \
+  -v $PWD/config:/snowplow/config snowplow-beam-enrich:0.1.0 \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/snowplow/config/credentials.json \ # if running outside GCP
   --runner=DataFlowRunner \
+  --project=project-id \
   --streaming=true \
   --zone=europe-west2-a \
   --gcpTempLocation=gs://location/ \
   --input=projects/project/subscriptions/raw-topic-subscription \
   --output=projects/project/topics/enriched-topic \
   --bad=projects/project/topics/bad-topic \
-  --resolver=iglu_resolver.json \
-  --enrichments=enrichments/
+  --resolver=/snowplow/config/iglu_resolver.json \
+  --enrichments=/snowplow/config/enrichments/
 ```
+
+To display the help message:
+
+```bash
+docker run snowplow-beam-enrich:0.1.0 \
+  --runner=DataFlowRunner \
+  --help
+```
+
+### Additional information
 
 Note that, for the enrichments relying on local files, the files need to be accessible from Google
 Cloud Storage, e.g. for the IP lookups enrichment:
